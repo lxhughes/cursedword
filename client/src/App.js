@@ -1,18 +1,20 @@
-import logo from './logo.svg';
+import React from 'react';
+import { Inputarea } from './features/Inputarea.js';
 import './App.css';
-import Inputarea from './Inputarea.js';
 
 function App() {
+      
   return (
     <div className="App">
       <header className="App-header">
-        Absurdle 🙃
+              Absurdle 🙃
       </header>
       
-      <Inputarea wordlength="5" />
+      <Inputarea />
       
     </div>
   );
+
 }
 
 export default App;

@@ -1,9 +1,6 @@
-import React from "react";
-
-               
-class Lettertile extends React.Component { 
+export function Lettertile(letterpos) { 
     
-  handleChange = (event) => {
+  const handleChange = (event) => {
     
       // Tab to next letter
       if (event.target.value.length >= event.target.maxLength) {
@@ -19,13 +16,11 @@ class Lettertile extends React.Component {
       }
       
   };
-               
-  render() {
       
-      const name = "lettertile_"+this.props.letterpos;
+  const name = "lettertile_"+letterpos;
       
-      return <input type='text' id={name} name={name} data-letterpos={this.props.letterpos} className='lettertile form-control' maxLength='1' onChange={this.handleChange}></input>;
-  }         
-}
+  return (
+      <input type='text' id={name} name={name} data-letterpos={letterpos} className='lettertile form-control' maxLength='1' onChange={handleChange}></input>
+  );
 
-export default Lettertile;
+}

@@ -1,14 +1,16 @@
-import React from "react";
-import store from './store';
-import Lettertile from "./Lettertile.js";
+import store from '../app/store';
+import { Lettertile } from "./Lettertile.js";
 
-class Inputarea extends React.Component {
+export function Inputarea() {
+    
+   const wordLength = 5;
 
-   handleSubmit = (event) => {  
+   const handleSubmit = (event) => {  
        
        event.preventDefault(); // Prevent reload
        
-       // TO DO: Clear previous warnings, if any.
+       // TO DO: Clear previous errors, if any.
+       store.dispatch({ type: "error/clear" });
        
        // Munge together inputs to find guess.
        let guess = "";
@@ -16,19 +18,17 @@ class Inputarea extends React.Component {
        for(var i = 0; i < inputs.length; i++){
            guess += inputs[i].value;
        }
-       console.log(guess);
        
        // Check if guess has enough letters. If not, warn, and stop - allow user to edit what they've put.
-       if(guess.length !== this.props.wordlength){
-           
-           console.log("Word does not have enough letters.");
-           
-           // TO DO: Make a warning
-           
+       if(guess.length !== wordLength){
+           store.dispatch({ type: "error/set", payload: "Word does not have enough letters." })           
            return false;
        }
        
-       // TO DO: Submit to backend + receive back status & other info
+       // Add guess to guess history
+       store.dispatch({ type: "guesses/add", payload: guess })
+       
+       // TO DO: Submit guess history to backend
        
        // TO DO: If status is error, warn + allow redo
        
@@ -36,26 +36,22 @@ class Inputarea extends React.Component {
        
        // TO DO: If status is continue, harden row (highlighting CORRED/MISPLACED needed), clear input for next guess
    }
-    
-   render() {
-    
-    const wordLength = parseInt(this.props.wordlength);
 
     // Make a row
     let row = [];
     for(var i = 0; i < wordLength; i++){
-      row.push(<li key={i}><Lettertile letterpos={i} /></li>);
+      
+      let letterTile = Lettertile(i);
+        
+      row.push(<li key={i}>{ letterTile }</li>);
     }
     row.push(<li key={wordLength + 1}>
-             <input type='submit' onClick={this.handleSubmit} data-letterpos={wordLength} id={ "lettertile_" + (wordLength ) }></input>
+             <input type='submit' onClick={handleSubmit} data-letterpos={wordLength} id={ "lettertile_" + (wordLength ) }></input>
             </li>)
     
-    return <form className="Inputarea">
+    return (<form className="Inputarea">
             <ul>
                 { row }
             </ul>
-        </form>
-    }
+        </form>);
 }
-
-export default Inputarea;
