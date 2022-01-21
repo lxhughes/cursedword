@@ -3,8 +3,15 @@ exports.guessStringToList = function(guessstring){
     let guesses = [];
     
     if(guessstring != undefined){
-        guessstring.toLowerCase();
-        guesses = guessstring.split(",");
+        
+        // Split a string
+        if(typeof guessstring === 'string' || guessstring instanceof String){
+            guessstring.toLowerCase();
+            guesses = guessstring.split(",");
+        }
+        
+        // Remove duplicates
+        guesses = [...new Set(guesses)];
     }
     
     return guesses;

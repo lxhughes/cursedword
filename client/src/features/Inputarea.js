@@ -1,9 +1,12 @@
 import store from '../app/store';
+import axios from 'axios';
 import { Lettertile } from "./Lettertile.js";
 
 export function Inputarea() {
     
+   const backendurl = "http://localhost:8080/";
    const wordLength = 5;
+   const state = store.getState();
 
    const handleSubmit = (event) => {  
        
@@ -28,13 +31,37 @@ export function Inputarea() {
        // Add guess to guess history
        store.dispatch({ type: "guesses/add", payload: guess })
        
-       // TO DO: Submit guess history to backend
+       // SUBMIT TO SERVER
+       // Should this be more of a "when x changes do y" situation?
+       const axiosconfig = {
+          headers: { 'Content-Type': 'text' },
+          responseType: 'json'
+        };
        
-       // TO DO: If status is error, warn + allow redo
+       const modifiedUrl = backendurl + "?guesses=" + state.guesses.join(",");
        
-       // TO DO: If status is win, harden row (highlighting all to CORRECT), remove input, and show WIN text
+       console.log(modifiedUrl);
        
-       // TO DO: If status is continue, harden row (highlighting CORRED/MISPLACED needed), clear input for next guess
+       return axios
+          .get(modifiedUrl, axiosconfig)
+          .then((response) => {
+            console.log('Guess Submitted')
+            console.log(response.data);
+            
+            if(response.data.result === "error"){
+              store.dispatch({ type: "error/set", payload: response.data.error })    
+            }
+            else if(response.data.result === "win"){
+              store.dispatch({ type: "game/win" });
+            }
+            else{
+              store.dispatch({ type: "game/continue "}); 
+            }
+            
+          })
+          .catch(err => {
+            console.error(err);
+          });
    }
 
     // Make a row
