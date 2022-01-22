@@ -38,7 +38,7 @@ exports.validate = function(guess, wordlist){
     }
 
     if(!(/^[a-z]+$/.test(guess))){
-        ret.error = true;
+       ret.error = true;
        ret.errorMsg = "Guess can only accept alphabetic characters.";
        return ret;
     }
@@ -55,4 +55,24 @@ exports.validate = function(guess, wordlist){
     }
     
     return ret;
+}
+
+// Create the Guess Pattern
+// Generates HTML for a guess pattern (for a single guess)
+exports.makeGuessPattern = function(guess, pattern){
+    let guesspattern = [];
+    
+    for(var i = 0; i<guess.length; i++){
+        
+        let letter = { letter: guess[i], status: "unk" };
+        
+        if(pattern[i] == 'N') letter.status = "wrong";
+        if(pattern[i] == 'M') letter.status = "mis";
+        if(pattern[i] == 'Y') letter.status = "right";
+        
+        guesspattern.push(letter);
+
+    }
+    
+    return guesspattern;
 }

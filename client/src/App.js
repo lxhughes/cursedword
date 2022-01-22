@@ -1,13 +1,13 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import { Guesses } from './features/Guesses.js';
 import { Inputarea } from './features/Inputarea.js';
 import { Errors } from './features/Errors.js';
+import { Keyboard } from './features/Keyboard.js';
 import './App.css';
 import store from './app/store';
 
 function App() {
-    
-    const state = store.getState();
       
   return (
     <div className="App">
@@ -16,13 +16,10 @@ function App() {
       </header>
       
       <div id="main">
+        <Guesses />
         <Inputarea />
-        <Errors />  
-      
-        <div className="info">
-        <h3>Guesses:</h3>
-            { state.guesses }
-        </div>
+        <Errors />
+        <Keyboard />
       </div>
       
     </div>

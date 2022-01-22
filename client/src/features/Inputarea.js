@@ -5,7 +5,6 @@ import { Lettertile } from "./Lettertile.js";
 export function Inputarea() {
     
    const backendurl = "http://localhost:8080/";
-   const wordLength = 5;
    const state = store.getState();
 
    const handleSubmit = (event) => {  
@@ -18,18 +17,25 @@ export function Inputarea() {
        // Munge together inputs to find guess.
        let guess = "";
        const inputs = document.querySelectorAll(".lettertile");
-       for(var i = 0; i < inputs.length; i++){
+       for(var i = 0; i < inputs.length; i++){           
            guess += inputs[i].value;
        }
        
-       // Check if guess has enough letters. If not, warn, and stop - allow user to edit what they've put.
-       if(guess.length !== wordLength){
-           store.dispatch({ type: "error/set", payload: "Word does not have enough letters." })           
+       // Check if guess is alpha only       
+        if(!/^[a-z]+$/i.test(guess)){
+           store.dispatch({ type: "error/set", payload: "Guess contains non-alphabetic characters." })           
+           return false;
+       }
+       
+       // Check if guess has enough letters
+       if(guess.length !== state.wordLength){
+           store.dispatch({ type: "error/set", payload: "Guess does not have enough letters." })           
            return false;
        }
        
        // Add guess to guess history
-       store.dispatch({ type: "guesses/add", payload: guess })
+       const guessesToSend = [...state.guesses, guess];
+       const modifiedUrl = backendurl + "?guesses=" + guessesToSend.join(",");
        
        // SUBMIT TO SERVER
        // Should this be more of a "when x changes do y" situation?
@@ -38,10 +44,6 @@ export function Inputarea() {
           responseType: 'json'
         };
        
-       const modifiedUrl = backendurl + "?guesses=" + state.guesses.join(",");
-       
-       console.log(modifiedUrl);
-       
        return axios
           .get(modifiedUrl, axiosconfig)
           .then((response) => {
@@ -49,13 +51,16 @@ export function Inputarea() {
             console.log(response.data);
             
             if(response.data.result === "error"){
-              store.dispatch({ type: "error/set", payload: response.data.error })    
+              store.dispatch({ type: "error/set", payload: response.data.errorMsg });
             }
             else if(response.data.result === "win"){
-              store.dispatch({ type: "game/win" });
+              store.dispatch({ type: "gamedata/set", payload: response.data });
+              
             }
-            else{
-              store.dispatch({ type: "game/continue "}); 
+            else{ // Continue game
+              store.dispatch({ type: "gamedata/set", payload: response.data }); // Pull new game data from server
+              document.getElementById("guessForm").reset(); // Clear form for next guess
+              document.querySelector("#lettertile_0").focus(); // Set focus on 1st letter
             }
             
           })
@@ -66,17 +71,17 @@ export function Inputarea() {
 
     // Make a row
     let row = [];
-    for(var i = 0; i < wordLength; i++){
+    for(var i = 0; i < state.wordLength; i++){
       
       let letterTile = Lettertile(i);
         
       row.push(<li key={i}>{ letterTile }</li>);
     }
-    row.push(<li key={wordLength + 1}>
-             <input type='submit' onClick={handleSubmit} data-letterpos={wordLength} id={ "lettertile_" + (wordLength ) }></input>
+    row.push(<li key={state.wordLength + 1}>
+             <input type='submit' onClick={handleSubmit} data-letterpos={state.wordLength} id={ "lettertile_" + (state.wordLength ) }></input>
             </li>)
     
-    return (<form className="Inputarea">
+    return (<form id="guessForm" className="InputArea">
             <ul>
                 { row }
             </ul>

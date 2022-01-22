@@ -31,8 +31,6 @@ http.createServer(function (req, res) {
     /* Get 'guesses' from POST or GET */
     let guesses = [];
     
-    console.log(req.method);
-    
     if (req.method == 'POST') {
         
         var body = '';

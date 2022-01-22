@@ -17,12 +17,27 @@
   color: rgb(112, 76, 182);
 }
 
+.hidden {
+    display: none;
+}
+
 ul {
     list-style-type: none;
 }
 
 li {
     display: inline-block;
+}
+
+ul.guesspatterns li {
+    display: block;
+}
+
+div.pastletter, input.lettertile {
+    display: inline-block;
+    padding: 0.5em;
+    margin: 0.5em;
+    border: 2px solid #DDD;
 }
 
 #main{
@@ -36,6 +51,18 @@ li {
     padding: 1em;
 }
 
-.info{
-    background-color: #FFF;
+
+/* Statuses */
+.unk{
+    background-color: #CCC;
+}
+.right{
+    background-color: #0F0;
+}
+.mis{
+    background-color: #FF0;
+}
+.wrong{
+    background-color: #000;
+    color: #FFF;
 }

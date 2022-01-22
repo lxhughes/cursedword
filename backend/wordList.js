@@ -1,4 +1,5 @@
 var gu = require('./guess');
+var kb = require('./keyboard');
 
 // Get the initial dictionary
 exports.getInitialWordList = function(){
@@ -23,15 +24,16 @@ exports.getInitialWordList = function(){
 // This is the main function of the game. 
 exports.filterGuessList = function(guesses, currentwordlist){
     
+    const initkeyboard = kb.getInitialKeyboard();
+    
     let gamedata = {
         
         "guesses": guesses,
         "result": "init",
-        "wrongletters": [],
+        "keyboard": initkeyboard,
         "guesspatterns": [],
         "possibleanswers": currentwordlist.length,
-        "wordlist": currentwordlist,
-        "errors": []
+        "wordlist": currentwordlist
     };
     
     for(var i = 0; i < guesses.length; i++){
@@ -39,8 +41,10 @@ exports.filterGuessList = function(guesses, currentwordlist){
         // Validate guess
         let errorJSON = gu.validate(guesses[i]);
         if(errorJSON.error){
-            gamedata.errors.push(errorJSON.errorMsg);
-            continue; // Skip this guess   
+            gamedata.result = "error";
+            gamedata.errorMsg = errorJSON.errorMsg;
+            continue; // Skip this guess 
+            //break; // Stop processing
         }
         
         // Check different situations:
@@ -49,7 +53,7 @@ exports.filterGuessList = function(guesses, currentwordlist){
             
             gamedata.result = "continue";
             gamedata.possibleanswers = 1;
-            gamedata = playWordle(gamedata);
+            gamedata = playWordle(gamedata, i);
         }
         else {
         
@@ -61,14 +65,11 @@ exports.filterGuessList = function(guesses, currentwordlist){
                 gamedata.wordlist = newwordlist;
                 gamedata.possibleanswers = newwordlist.length;
 
-                // Add all letters to wrong guess list
-                let wrongletters = gamedata.wrongletters.concat(guesses[i].split(""));
-                wrongletters = [...new Set(wrongletters)]; // Remove dupes
-                wrongletters.sort();
-                gamedata.wrongletters = wrongletters;
+                // Update keyboard with wrong letters
+                gamedata.keyboard = kb.updateKeyboardStatus(guesses[i], "wrong", gamedata.keyboard);
 
                 // Add a guess pattern of NOs
-                gamedata.guesspatterns.push(makeGuessPatternHTML(guesses[i], 'NNNNN'));
+                gamedata.guesspatterns.push(gu.makeGuessPattern(guesses[i], 'NNNNN'));
 
             }
             else if(newwordlist.length == 1){ // We have our answer.
@@ -155,14 +156,13 @@ chooseWorstAnswer = function(guess, wordlist){
 // Given game data with exactly one answer in the current word list, play Wordle. Return game data.
 playWordle = function(gamedata, index){
     
-    if(index == undefined) index = gamedata.guesses.length - 1;
-    
     const answer = gamedata.wordlist[0];
     const guess = gamedata.guesses[index];
     
     if(guess == answer){
         gamedata.result = "win";
-        gamedata.guesspatterns.push(makeGuessPatternHTML(guess, 'YYYYY'));
+        gamedata.guesspatterns.push(gu.makeGuessPattern(guess, 'YYYYY'));
+        gamedata.keyboard = kb.updateKeyboardStatus(guess, "right", gamedata.keyboard); 
         return gamedata;
     }
     else {
@@ -170,16 +170,69 @@ playWordle = function(gamedata, index){
         let guesspattern = "";
         
         // Analyze current guess against answer
-        for(var i = 0; i <= guess.length; i++){
+        for(var i = 0; i < guess.length; i++){
             
-            if(guess[i] == answer[i]) guesspattern += 'Y';
             
-            else if(answer.includes(guess[i])) guesspattern += 'M'; // Misplaced
+            let gidxs = getAllIndexes(guess[i], guess); // Also, how many are in the answer.
             
-            else guesspattern += 'N';
+            if(answer[i] == guess[i]){ // RIGHT LETTER AT RIGHT POSITION!
+                guesspattern += 'Y';
+                gamedata.keyboard = kb.updateKeyboardStatus(guess[i], "right", gamedata.keyboard);
+            }
+            else {
+                
+                // Get all the indexes (positions) of the current letter in the answer word.
+                let aidxs = getAllIndexes(guess[i], answer);
+                
+                if(aidxs.length == 0){ // WRONG LETTER - DOES NOT OCCUR
+                    guesspattern += 'N'; 
+                    gamedata.keyboard = kb.updateKeyboardStatus(guess[i], "wrong", gamedata.keyboard);
+                }
+                
+                else { 
+                    
+                    // All this extra logic is to avoid confusing people by marking the same letter as misplaced
+                    // if another instance of it has already been correctly placed
+                    // or by marking 2 of the same letter as misplaced when there's only one in the word.
+                    
+                    // Get all the indexes (positions) of the current letter in the *guess*
+                    let gidxs = getAllIndexes(guess[i], guess);
+                    
+                    // Get just the guess letters that are correctly placed.
+                    let incorrect_gidxs = gidxs.filter(n => !aidxs.includes(n));  
+
+                    // This is the nth instance of this letter in the guess...
+                    const nth = gidxs.indexOf(i);
+                    const incorrect_nth = incorrect_gidxs.indexOf(i)
+                    
+                    // If this is the nth instance of its letter, and the nth that is incorrectly placed, and n does not exceed the number of times the letter appears in the final, it's misplaced here.
+                    if(nth <= incorrect_nth && nth < aidxs.length ){
+                        guesspattern += 'M';
+                    }
+                    else{ // Otherwise, it's wrong here ("extra" instances of a letter), but don't change the keyboard coloring
+                       guesspattern += 'N'; 
+                    }
+                    
+                    // To tell what color it is in the keyboard is slightly different logic.
+                    // If there are ANY correctly placed, make it green.
+                    // Otherwise, make it yellow.
+                    let correct_gidxs = gidxs.filter(n => aidxs.includes(n)); 
+                    
+                    if(correct_gidxs.length > 0){
+                        gamedata.keyboard = kb.updateKeyboardStatus(guess[i], "right", gamedata.keyboard);
+                    }
+                    else{
+                        gamedata.keyboard = kb.updateKeyboardStatus(guess[i], "mis", gamedata.keyboard);
+                    }
+                }
+                
+            }
+            
+            
+            
         }
         
-        gamedata.guesspatterns.push(makeGuessPatternHTML(guess, guesspattern));
+        gamedata.guesspatterns.push(gu.makeGuessPattern(guess, guesspattern));
         
     }
     
@@ -187,19 +240,12 @@ playWordle = function(gamedata, index){
     
 }
 
-// Generates HTML for a guess pattern
-makeGuessPatternHTML = function(guess, pattern){
-    let string = "";
-    
-    for(var i = 0; i<guess.length; i++){
-        string += "<span class='";
-        if(pattern[i] == 'N') string += "wrongletter";
-        if(pattern[i] == 'M') string += "misplacedletter";
-        if(pattern[i] == 'Y') string += "correctletter";
-        string += '">';
-        string += guess[i].toUpperCase();
-        string += "</span>";
-    }
-    
-    return string;
+// Support function that returns all the indexes of a given val in an arr/string
+// Lets me know where this letter occurs in the word. 
+function getAllIndexes(val, arr) {
+    var indexes = [], i;
+    for(i = 0; i < arr.length; i++)
+        if (arr[i] === val)
+            indexes.push(i);
+    return indexes;
 }

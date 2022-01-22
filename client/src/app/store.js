@@ -1,8 +1,16 @@
 import { configureStore } from '@reduxjs/toolkit';
 
+// Set initial keyboard
+const qwerty = "qwertyuiopasdfghjklzxcvbnm";
+let initKeyboard = [];
+qwerty.split("").forEach(element => initKeyboard.push( { letter: element, status: "unk" } ));
+
 const initialState = {
-    "error": "",
-    "guesses": []
+    "wordLength": 5, // A constant
+    "error": "", // Current error to show
+    "guesses": [], // A plain list of guesses, used to create the query string
+    "guesspatterns": [], // A version of guesses with the status of each letter
+    "keyboard": initKeyboard // Keyboard keys with status of each letter
 }
 
 function rootReducer(state = initialState, action) {
@@ -11,17 +19,19 @@ function rootReducer(state = initialState, action) {
     
     switch (action.type) {
             
-        case 'guesses/add': return {
-             ...state,
-             guesses: [...state.guesses, action.payload]
-          };    
+        case 'gamedata/set': return { // Set data from server gamedata
+            ...state,
+            guesses: action.payload.guesses,
+            guesspatterns: action.payload.guesspatterns,
+            keyboard: action.payload.keyboard
+        };   
         
-        case 'error/set': return {
+        case 'error/set': return { // Set an error message
              ...state,
              error: action.payload
           };
             
-        case 'error/clear': return {
+        case 'error/clear': return { // Clear error messages
              ...state,
              error: ""
           };    
