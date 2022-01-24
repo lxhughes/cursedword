@@ -20,7 +20,7 @@ export function Lettertile(letterpos) {
   const name = "lettertile_"+letterpos;
 
   let autoFocus = false;
-    if(letterpos == 0) autoFocus = true;
+    if(letterpos === 0) autoFocus = true;
       
   return (
       <input type='text' id={name} name={name} autoFocus={autoFocus} data-letterpos={letterpos} className='lettertile unk form-control' maxLength='1' size='1' onChange={handleChange}></input>

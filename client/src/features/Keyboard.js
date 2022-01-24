@@ -1,19 +1,42 @@
 import store from '../app/store';
-import { KeyboardKey } from "./KeyboardKey.js";
+import { KeyboardKey, EnterKey, BackspaceKey } from "./KeyboardKey.js";
 
 export function Keyboard() {
 
    const state = store.getState();
-    
-   let keyboard = [];
-   for(var i=0; i<26; i++){
-       keyboard[i] = KeyboardKey(state.keyboard[i]);
+   
+   // First row
+   let keyboardRow1 = [];
+   for(var i=0; i<10; i++){
+       keyboardRow1[i] = KeyboardKey(state.keyboard[i]);
    }
+    
+   // Middle row
+   let keyboardRow2 = [];
+   for(var j=10; j<19; j++){
+       keyboardRow2[j] = KeyboardKey(state.keyboard[j]);
+   } 
+    
+   // Bottom row
+   let keyboardRow3 = [];
+   for(var k=19; k<26; k++){
+       keyboardRow3[k] = KeyboardKey(state.keyboard[k]);
+   } 
 
    return (
-        <ul id="keyboard">
-            { keyboard }
-        </ul>
+       <div id="keyboard">
+            <ul className="keyboardRow">
+                { keyboardRow1 }
+            </ul>
+           <ul className="keyboardRow">
+                { keyboardRow2 }
+            </ul>
+           <ul className="keyboardRow">
+                { EnterKey() }
+                { keyboardRow3 }
+                { BackspaceKey() }
+            </ul>
+       </div>
     );
         
 }

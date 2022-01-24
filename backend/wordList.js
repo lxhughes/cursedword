@@ -69,7 +69,7 @@ exports.filterGuessList = function(guesses, currentwordlist){
                 gamedata.keyboard = kb.updateKeyboardStatus(guesses[i], "wrong", gamedata.keyboard);
 
                 // Add a guess pattern of NOs
-                gamedata.guesspatterns.push(gu.makeGuessPattern(guesses[i], 'NNNNN'));
+                gamedata.guesspatterns.push(gu.makeGuessPattern(guesses[i], 'NNNNN', i));
 
             }
             else if(newwordlist.length == 1){ // We have our answer.
@@ -161,7 +161,7 @@ playWordle = function(gamedata, index){
     
     if(guess == answer){
         gamedata.result = "win";
-        gamedata.guesspatterns.push(gu.makeGuessPattern(guess, 'YYYYY'));
+        gamedata.guesspatterns.push(gu.makeGuessPattern(guess, 'YYYYY', index));
         gamedata.keyboard = kb.updateKeyboardStatus(guess, "right", gamedata.keyboard); 
         return gamedata;
     }
@@ -232,7 +232,7 @@ playWordle = function(gamedata, index){
             
         }
         
-        gamedata.guesspatterns.push(gu.makeGuessPattern(guess, guesspattern));
+        gamedata.guesspatterns.push(gu.makeGuessPattern(guess, guesspattern, index));
         
     }
     

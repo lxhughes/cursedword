@@ -59,8 +59,8 @@ exports.validate = function(guess, wordlist){
 
 // Create the Guess Pattern
 // Generates HTML for a guess pattern (for a single guess)
-exports.makeGuessPattern = function(guess, pattern){
-    let guesspattern = [];
+exports.makeGuessPattern = function(guess, pattern, turnnumber){
+    let guesspatternletters = [];
     
     for(var i = 0; i<guess.length; i++){
         
@@ -70,9 +70,9 @@ exports.makeGuessPattern = function(guess, pattern){
         if(pattern[i] == 'M') letter.status = "mis";
         if(pattern[i] == 'Y') letter.status = "right";
         
-        guesspattern.push(letter);
+        guesspatternletters.push(letter);
 
     }
     
-    return guesspattern;
+    return { letters: guesspatternletters, turnnumber: turnnumber };
 }

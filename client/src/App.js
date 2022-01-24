@@ -4,13 +4,15 @@ import { Guesses } from './features/Guesses.js';
 import { Inputarea } from './features/Inputarea.js';
 import { Errors } from './features/Errors.js';
 import { Keyboard } from './features/Keyboard.js';
-import './App.css';
-import store from './app/store';
+import  { handleKeyDown } from './features/Utils.js';
+
+import './App.scss';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 function App() {
-      
+    
   return (
-    <div className="App">
+    <div className="App" tabIndex={1} onKeyDown={handleKeyDown}>
       <header className="App-header">
               Cursed Wordle 🙃
       </header>

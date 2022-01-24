@@ -1,3 +1,8 @@
+$wrongBgColor: #000000;
+$rightBgColor: #00FF00;
+$misplacedBgColor: #FFFF00;
+$unknownBgColor: #666666;
+
 .App {
   text-align: center;
   background-color: #282c34;
@@ -29,7 +34,7 @@ li {
     display: inline-block;
 }
 
-ul.guesspatterns li {
+ul#guesspatterns li {
     display: block;
 }
 
@@ -38,6 +43,10 @@ div.pastletter, input.lettertile {
     padding: 0.5em;
     margin: 0.5em;
     border: 2px solid #DDD;
+}
+
+.keyboardkey {
+    margin: 0.2em;
 }
 
 #main{
@@ -52,17 +61,18 @@ div.pastletter, input.lettertile {
 }
 
 
+
 /* Statuses */
 .unk{
-    background-color: #CCC;
+    background-color: $unknownBgColor !important;
 }
 .right{
-    background-color: #0F0;
+    background-color: $rightBgColor !important;
 }
 .mis{
-    background-color: #FF0;
+    background-color: $misplacedBgColor !important;
 }
 .wrong{
-    background-color: #000;
+    background-color: $wrongBgColor !important;
     color: #FFF;
 }
