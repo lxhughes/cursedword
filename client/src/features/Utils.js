@@ -1,5 +1,6 @@
 import store from '../app/store';
 import axios from 'axios';
+import { backendurl } from '../config.js';
 
 // Support function to find the first empty input field
 const findFirstEmptyInput = function(){
@@ -34,7 +35,6 @@ export const handleFormSubmit = (event) => {
    event.preventDefault(); // Prevent reload
     
    const state = store.getState();
-       const backendurl = "http://localhost:8080/";
 
    // TO DO: Clear previous errors, if any.
    store.dispatch({ type: "error/clear" });
@@ -72,8 +72,6 @@ export const handleFormSubmit = (event) => {
    return axios
       .get(modifiedUrl, axiosconfig)
       .then((response) => {
-        console.log('Guess Submitted')
-        console.log(response.data);
 
         if(response.data.result === "error"){
           store.dispatch({ type: "error/set", payload: response.data.errorMsg });
@@ -85,7 +83,7 @@ export const handleFormSubmit = (event) => {
         else{ // Continue game
           store.dispatch({ type: "gamedata/set", payload: response.data }); // Pull new game data from server
           document.getElementById("guessForm").reset(); // Clear form for next guess
-          document.querySelector("#lettertile_0").focus(); // Set focus on 1st letter
+          document.getElementById("lettertile_0").focus(); // Set focus on 1st letter
         }
 
       })
@@ -95,32 +93,61 @@ export const handleFormSubmit = (event) => {
 }
 
 // What happens when you click a letter
-export const letterPressAction = function(letter){
+export const letterPressAction = function(event, letter){
+
+        event.preventDefault();
     
-    // Find next available box
-      const firstEmpty = findFirstEmptyInput();
-      
-      if(firstEmpty){
-            firstEmpty.value = letter; // Set value to this letter
+        // See if an input box if focused. If not, find the first (leftmost) box with nothing in it.
+        let startHere = document.activeElement;
+        let letterPos = 0;
+    
+        if(!startHere || startHere.tagName != "INPUT"){
+            const startHere = findFirstEmptyInput();
+        }
+
+        if(startHere){
+            startHere.value = letter; // Set value to this letter
+            letterPos = parseInt(startHere.getAttribute("data-letterpos"));
+        }
+    
+        // Now find next empty give focus to that one (if applicable)
+        const nextEmpty = document.getElementById("lettertile_"+(letterPos+1));
+        if(nextEmpty){
+          nextEmpty.focus();
         }
 }
 
 // What happens when you backspace
 export const handleBackspace = function(event){
+    
+      event.preventDefault();
+    
+      // See if an input box is focused. If not, find the last (rightmost) box with anything in it.
+      let startHere = document.activeElement;
+      let letterPos = 5;
 
-      // Find next available box
-      const lastFilled = findLastFilledInput();
+      if(!startHere || startHere.tagName != "INPUT") {
+          startHere = findLastFilledInput();
+      }
+    
+      // Clear the element
+      if(startHere){
+          startHere.value = "";
+          letterPos = parseInt(startHere.getAttribute("data-letterpos"));
+      }
 
-      if(lastFilled){
-            lastFilled.value = ""; // Set value to this letter
-        }
-
+    // Now find the next last filled to set focus.
+    const lastLastFilled = document.getElementById("lettertile_"+(letterPos-1));
+    if(lastLastFilled){
+        lastLastFilled.focus();
+    }
+   
 }
 
 // Generalized handler to determine which button was pushed and funnel accordingly
 export const handleKeyDown = function(event){
     if(event.keyCode === 13) handleFormSubmit(event);
     else if(event.keyCode === 8) handleBackspace(event);
-    else if(event.keyCode >= 65 && event.keyCode <= 90) letterPressAction(event.key);
+    else if(event.keyCode >= 65 && event.keyCode <= 90) letterPressAction(event, event.key);
     
 }

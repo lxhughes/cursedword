@@ -21,10 +21,15 @@ export function Keyboard() {
    let keyboardRow3 = [];
    for(var k=19; k<26; k++){
        keyboardRow3[k] = KeyboardKey(state.keyboard[k]);
-   } 
+   }
+    
+   let className = "Keyboard show";
+    if(state.result === "win"){
+        className = "Keyboard hidden";
+    }
 
    return (
-       <div id="keyboard">
+       <div id="keyboard" className={className}>
             <ul className="keyboardRow">
                 { keyboardRow1 }
             </ul>

@@ -20,7 +20,7 @@ function Guess(guesspattern){
     const likey = "gp_" + guesspattern.turnnumber;
     
     return (
-        <li key={guesspattern.turnnumber} id={likey} className="guesspattern">{ gp }</li>
+        <li key={likey} id={likey} className="guesspattern">{ gp }</li>
     );
 }
 

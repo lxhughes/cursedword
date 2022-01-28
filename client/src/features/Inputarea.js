@@ -13,8 +13,14 @@ export function Inputarea() {
         
       row.push(<li key={i}>{ letterTile }</li>);
     }
+               
     
-    return (<form id="guessForm" className="InputArea">
+    let className = "InputArea show";
+    if(state.result === "win"){
+        className = "InputArea hidden";
+    }
+    
+    return (<form id="guessForm" className={className}>
             <ul>
                 { row }
             </ul>

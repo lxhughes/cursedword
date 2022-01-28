@@ -6,6 +6,7 @@ $unknownBgColor: #666666;
 .App {
   text-align: center;
   background-color: #282c34;
+  color: #669966;
   min-height: 100vh;
 }
 
@@ -24,6 +25,10 @@ $unknownBgColor: #666666;
 
 .hidden {
     display: none;
+}
+
+.show {
+    display: block;
 }
 
 ul {

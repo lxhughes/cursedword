@@ -4,12 +4,13 @@ import { Guesses } from './features/Guesses.js';
 import { Inputarea } from './features/Inputarea.js';
 import { Errors } from './features/Errors.js';
 import { Keyboard } from './features/Keyboard.js';
+import { Win } from './features/Win.js';
 import  { handleKeyDown } from './features/Utils.js';
 
 import './App.scss';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-function App() {
+function App({status}) {
     
   return (
     <div className="App" tabIndex={1} onKeyDown={handleKeyDown}>
@@ -21,6 +22,7 @@ function App() {
         <Guesses />
         <Inputarea />
         <Errors />
+        <Win />
         <Keyboard />
       </div>
       
@@ -31,7 +33,8 @@ function App() {
 
 const mapStateToProps = (state) => {
     return {
-        error: state.error,
+        result: state.result,
+        errror: state.error,
         guesses: state.guesses
     }
 };

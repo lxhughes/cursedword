@@ -5,7 +5,7 @@ export function KeyboardKey(key) {
     
   // Type the clicked letter in the next available box
   const handleClick = (event) => {
-      letterPressAction(key.letter);
+      letterPressAction(event, key.letter);
   }
     
   const keyboardClass = "keyboardkey "+key.status;

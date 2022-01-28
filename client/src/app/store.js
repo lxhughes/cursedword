@@ -10,12 +10,11 @@ const initialState = {
     "error": "", // Current error to show
     "guesses": [], // A plain list of guesses, used to create the query string
     "guesspatterns": [], // A version of guesses with the status of each letter
-    "keyboard": initKeyboard // Keyboard keys with status of each letter
+    "keyboard": initKeyboard, // Keyboard keys with status of each letter
+    "result": "continue"
 }
 
 function rootReducer(state = initialState, action) {
-    
-    console.log(action);
     
     switch (action.type) {
             
@@ -23,8 +22,9 @@ function rootReducer(state = initialState, action) {
             ...state,
             guesses: action.payload.guesses,
             guesspatterns: action.payload.guesspatterns,
-            keyboard: action.payload.keyboard
-        };   
+            keyboard: action.payload.keyboard,
+            result: action.payload.result
+        };
         
         case 'error/set': return { // Set an error message
              ...state,
@@ -36,7 +36,7 @@ function rootReducer(state = initialState, action) {
              error: ""
           };    
             
-        case 'restartGame': return initialState;
+        case 'game/restart': return initialState;
         default:
             return state
             
