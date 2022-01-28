@@ -102,7 +102,7 @@ export const letterPressAction = function(event, letter){
         let letterPos = 0;
     
         if(!startHere || startHere.tagName != "INPUT"){
-            const startHere = findFirstEmptyInput();
+            startHere = findFirstEmptyInput();
         }
 
         if(startHere){
